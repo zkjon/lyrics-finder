@@ -1,40 +1,70 @@
 import { useState } from 'preact/hooks';
 import type { JSX } from 'preact';
 
+interface Suggestion {
+	artist: {
+		name: string;
+	};
+	title: string;
+}
+
 export default function Chat() {
 	const [inputValue, setInputValue] = useState('');
 	const [lyrics, setLyrics] = useState<string[]>([]);
+	const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
+	const [showSuggestions, setShowSuggestions] = useState(false);
 
-	const handleSubmit = async (e: JSX.TargetedEvent<HTMLFormElement, Event>) => {
+	const fetchSuggestions = async (e: JSX.TargetedEvent<HTMLFormElement, Event>) => {
 		e.preventDefault();
 		if (!inputValue.trim()) return;
 
 		setIsSearching(true);
 		setLyrics([]);
+		setSuggestions([]);
+		setShowSuggestions(true);
 
-		// Extraer artista y título del input (formato: "Artista - Título")
-		const [artist, title] = inputValue.split("-").map(str => str.trim());
-		if (!artist || !title) {
-			setLyrics(["❌ Please enter in format: Artist - Title"]);
-			setIsSearching(false);
-			return;
+		try {
+			const res = await fetch(`/api/suggestions?q=${encodeURIComponent(inputValue)}`);
+			if (res.ok) {
+				const data = await res.json();
+				if (data.data && data.data.length > 0) {
+					setSuggestions(data.data);
+				} else {
+					setLyrics(["❌ No suggestions found for your search."]);
+					setShowSuggestions(false);
+				}
+			} else {
+				setLyrics(["❌ Error searching for suggestions."]);
+				setShowSuggestions(false);
+			}
+		} catch (err) {
+			setLyrics(["❌ API connection error."]);
+			setShowSuggestions(false);
 		}
+		setIsSearching(false);
+	};
+
+	const fetchLyrics = async (artist: string, title: string) => {
+		setSuggestions([]);
+		setShowSuggestions(false);
+		setIsSearching(true);
+		setLyrics([]);
 
 		try {
 			const res = await fetch(`/api/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
-			if (!res.ok) {
-				setLyrics(["❌ Lyrics not found or error searching."]);
-			} else {
+			if (res.ok) {
 				const data = await res.json();
 				if (data.lyrics) {
 					setLyrics(data.lyrics.split('\n').filter((line: string) => line.trim() !== ""));
 				} else {
 					setLyrics(["❌ No lyrics found for this song."]);
 				}
+			} else {
+				setLyrics(["❌ Lyrics not found or search error."]);
 			}
 		} catch (err) {
-			setLyrics(["❌ Error connecting to lyrics API."]);
+			setLyrics(["❌ Lyrics API connection error."]);
 		}
 		setIsSearching(false);
 	};
@@ -43,15 +73,15 @@ export default function Chat() {
 		<div className="w-full max-w-3xl mx-auto min-h-[60vh] flex flex-col">
 			{/* Header */}
 			<header className="py-10 px-5 text-center">
-				<h2 className="text-white m-0 text-4xl font-normal leading-tight">Write your song lyrics</h2>
+				<h2 className="text-white m-0 text-4xl font-normal leading-tight">Song Lyrics Finder</h2>
 			</header>
 
 			{/* Content Area */}
 			<div className="flex-1 py-10 px-5 flex items-center justify-center min-h-[200px]">
-				{lyrics.length === 0 && !isSearching ? (
+				{lyrics.length === 0 && suggestions.length === 0 && !isSearching ? (
 					<div className="text-center text-gray-400">
 						<div className="text-5xl mb-6 opacity-60">🎵</div>
-						<p className="m-0 text-lg text-gray-500">Write the name of a song or part of the lyrics</p>
+						<p className="m-0 text-lg text-gray-500">Type a song name or part of the lyrics</p>
 					</div>
 				) : (
 					<div className="w-full max-w-2xl">
@@ -62,7 +92,22 @@ export default function Chat() {
 									<span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '-0.16s' }}></span>
 									<span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
 								</div>
-								<p>Searching for lyrics...</p>
+								<p>{showSuggestions ? 'Searching suggestions...' : 'Searching lyrics...'}</p>
+							</div>
+						) : showSuggestions && suggestions.length > 0 ? (
+							<div className="w-full">
+								<h3 className="text-white text-xl mb-4 text-center">Select a song:</h3>
+								<ul className="space-y-2">
+									{suggestions.map((song, index) => (
+										<li 
+											key={index}
+											className="text-white py-3 px-4 bg-white/5 rounded-lg border border-neutral-600 hover:border-blue-500 hover:bg-white/10 cursor-pointer transition-all duration-200"
+											onClick={() => fetchLyrics(song.artist.name, song.title)}
+										>
+											<span className="font-semibold">{song.title}</span> - <span className="text-gray-300">{song.artist.name}</span>
+										</li>
+									))}
+								</ul>
 							</div>
 						) : (
 							lyrics.map((line, index) => (
@@ -76,7 +121,7 @@ export default function Chat() {
 			</div>
 
 			{/* Input Area */}
-			<form onSubmit={handleSubmit} className="px-5 pb-10">
+			<form onSubmit={fetchSuggestions} className="px-5 pb-10">
 				<div className="max-w-3xl mx-auto">
 					<div className="relative flex items-center bg-neutral-800 border border-neutral-600 rounded-[27px] py-3 px-4 transition-colors focus-within:border-neutral-500">
 						<svg className="text-gray-400 mr-3 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -86,7 +131,7 @@ export default function Chat() {
 							type="text"
 							value={inputValue}
 							onChange={(e) => setInputValue((e.target as HTMLInputElement).value)}
-							placeholder="Write lyrics here..."
+							placeholder="Search for a song..."
 							className="flex-1 bg-transparent border-none text-white text-base outline-none placeholder-gray-400 disabled:opacity-60 disabled:cursor-not-allowed"
 							disabled={isSearching}
 							id="lyrics-input"
