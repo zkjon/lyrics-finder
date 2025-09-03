@@ -70,7 +70,7 @@ export default function Chat() {
 	};
 
 	return (
-		<div className="w-full max-w-3xl mx-auto min-h-[60vh] flex flex-col">
+		<div className={`w-full max-w-3xl mx-auto min-h-[60vh] flex flex-col ${(suggestions.length > 0 || lyrics.length > 0) ? 'pb-32' : ''}`}>
 			{/* Header */}
 			<header className="py-10 px-5 text-center">
 				<h2 className="text-white m-0 text-4xl font-normal leading-tight">Song Lyrics Finder</h2>
@@ -121,7 +121,7 @@ export default function Chat() {
 			</div>
 
 			{/* Input Area */}
-			<form onSubmit={fetchSuggestions} className="px-5 pb-10">
+			<form onSubmit={fetchSuggestions} className={`px-5 pb-10 ${(suggestions.length > 0 || lyrics.length > 0) ? 'fixed bottom-10 left-0 right-0' : ''}`}>
 				<div className="max-w-3xl mx-auto">
 					<div className="relative flex items-center bg-neutral-800 border border-neutral-600 rounded-[27px] py-3 px-4 transition-colors focus-within:border-neutral-500">
 						<svg className="text-gray-400 mr-3 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none">
