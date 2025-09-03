@@ -11,17 +11,32 @@ export default function Chat() {
 		if (!inputValue.trim()) return;
 
 		setIsSearching(true);
-		
-		// Simulamos búsqueda de letras
-		setTimeout(() => {
-			setLyrics([
-				"🎵 Searching for lyrics...",
-				"✅ Found lyrics for your song!",
-				"🎤 [This would display the song lyrics here]",
-				"📝 Note: In a real app, this would connect to a lyrics API"
-			]);
+		setLyrics([]);
+
+		// Extraer artista y título del input (formato: "Artista - Título")
+		const [artist, title] = inputValue.split("-").map(str => str.trim());
+		if (!artist || !title) {
+			setLyrics(["❌ Please enter in format: Artist - Title"]);
 			setIsSearching(false);
-		}, 2000);
+			return;
+		}
+
+		try {
+			const res = await fetch(`/api/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+			if (!res.ok) {
+				setLyrics(["❌ Lyrics not found or error searching."]);
+			} else {
+				const data = await res.json();
+				if (data.lyrics) {
+					setLyrics(data.lyrics.split('\n').filter((line: string) => line.trim() !== ""));
+				} else {
+					setLyrics(["❌ No lyrics found for this song."]);
+				}
+			}
+		} catch (err) {
+			setLyrics(["❌ Error connecting to lyrics API."]);
+		}
+		setIsSearching(false);
 	};
 
 	return (
