@@ -77,6 +77,22 @@ export default function Chat() {
 							id="lyrics-input"
 						/>
 						<div className="flex gap-2 ml-3">
+							<button
+								type="button"
+								className="px-2 py-1 text-secondary/60 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
+								onClick={async () => {
+									try {
+										const text = await navigator.clipboard.readText();
+										setInputValue(text);
+									} catch (err) {
+										console.error("Failed to read clipboard contents:", err);
+									}
+								}}
+								disabled={isSearching}
+								aria-label="Paste from clipboard"
+							>
+								Paste
+							</button>
 							<button 
 								type="submit" 
 								className="px-2 py-1 text-secondary/60 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
