@@ -1,22 +1,46 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <title>Lyrics Finder - Find songs by lyrics</title>
+    <meta
+      name="description"
+      content="Lyrics Finder is a simple app that lets you search for songs by typing part of the lyrics. Discover the title, artist, and more details about your favorite track."
+    />
+    <meta
+      name="keywords"
+      content="lyrics finder, find song by lyrics, search songs by lyrics, song identifier, music search"
+    />
+    <meta name="author" content="YourName or YourTeamName" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yourdomain.com/" />
+    <meta property="og:title" content="Lyrics Finder - Find songs by lyrics" />
+    <meta
+      property="og:description"
+      content="Search and discover songs easily by entering a few words from the lyrics."
+    />
+    <meta property="og:image" content="https://yourdomain.com/preview.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://yourdomain.com/" />
+    <meta name="twitter:title" content="Lyrics Finder - Find songs by lyrics" />
+    <meta
+      name="twitter:description"
+      content="Discover songs instantly by typing just a part of the lyrics with Lyrics Finder."
+    />
+    <meta name="twitter:image" content="https://yourdomain.com/preview.png" />
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+<style is:global>
+	@import '@/assets/css/global.css';
 </style>
