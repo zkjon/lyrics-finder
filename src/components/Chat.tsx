@@ -61,7 +61,7 @@ export default function Chat() {
 					setLyrics(["❌ No lyrics found for this song."]);
 				}
 			} else {
-				setLyrics(["❌ Lyrics not found or search error."]);
+				setLyrics(["❌ Lyrics not found."]);
 			}
 		} catch (err) {
 			setLyrics(["❌ Lyrics API connection error."]);
