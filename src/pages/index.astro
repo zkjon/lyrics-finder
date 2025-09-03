@@ -1,11 +1,12 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Chat from '@/components/Chat';
+import Layout from '@/layouts/Layout.astro';
 ---
 
 <Layout>
-	<Welcome />
+	<main class="min-h-screen flex items-center justify-center p-4">
+		<div class="w-full max-w-4xl">
+			<Chat client:load/>
+		</div>
+	</main>
 </Layout>
