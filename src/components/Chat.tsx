@@ -1,43 +1,27 @@
 import { useState } from 'preact/hooks';
 import type { JSX } from 'preact';
 
-// TODO: Reemplaza por tu token real
-const GENIUS_API_TOKEN = "TU_TOKEN_DE_API";
-
 export default function Chat() {
 	const [inputValue, setInputValue] = useState('');
 	const [lyrics, setLyrics] = useState<string[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
 
 	const handleSubmit = async (e: JSX.TargetedEvent<HTMLFormElement, Event>) => {
-	e.preventDefault();
+		e.preventDefault();
 		if (!inputValue.trim()) return;
 
 		setIsSearching(true);
-	setLyrics(["🎵 Searching for lyrics..."]);
-
-	try {
-		const response = await fetch(`https://api.genius.com/search?q=${encodeURIComponent(inputValue)}`, {
-			headers: {
-				Authorization: `Bearer ${GENIUS_API_TOKEN}`
-			}
-		});
-		const data = await response.json();
-		if (data.response && data.response.hits && data.response.hits.length > 0) {
-			const best = data.response.hits[0].result;
+		
+		// Simulamos búsqueda de letras
+		setTimeout(() => {
 			setLyrics([
-				`✅ Found:`,
-				`🎵 ${best.title} - ${best.primary_artist.name}`,
-				best.url ? `🔗 Genius: ${best.url}` : "No Genius URL available"
+				"🎵 Searching for lyrics...",
+				"✅ Found lyrics for your song!",
+				"🎤 [This would display the song lyrics here]",
+				"📝 Note: In a real app, this would connect to a lyrics API"
 			]);
-		} else {
-			setLyrics(["❌ No song found for that lyric fragment."]);
-		}
-	} catch (err) {
-		setLyrics(["❌ Error searching Genius API."]);
-		console.error(err);
-	}
-	setIsSearching(false);
+			setIsSearching(false);
+		}, 2000);
 	};
 
 	return (
@@ -93,21 +77,6 @@ export default function Chat() {
 							id="lyrics-input"
 						/>
 						<div className="flex gap-2 ml-3">
-                            <button
-                                type="button"
-                                className="px-2 py-1 text-secondary/60 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
-                                disabled={isSearching}
-                                onClick={async () => {
-                                    try {
-                                        const text = await navigator.clipboard.readText();
-                                        setInputValue(text);
-                                    } catch (err) {
-                                       console.error('Failed to read clipboard contents: ', err);
-                                    }
-                                }}
-                            >
-                                Paste
-                            </button>
 							<button 
 								type="submit" 
 								className="px-2 py-1 text-secondary/60 hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors"
